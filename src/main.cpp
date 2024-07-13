@@ -96,20 +96,35 @@ void setup() {
     Serial.println(WiFi.localIP());
     setClock();
     wifiClient.setInsecure();
-    if (pubSubClient.connect("arduinoClient", MQTT_USER, MQTT_PW)){
-
-        pubSubClient.subscribe("d4Lights");
-    }
-    else {
-        Serial.println("Connection failed");
+    while (pubSubClient.state() != MQTT_CONNECTED) {
+        if (pubSubClient.connect("arduinoClient", MQTT_USER, MQTT_PW)) {
+            Serial.println("topic subscribing now");
+            pubSubClient.subscribe("d4Lights");
+        } else {
+            Serial.println("Connection failed");
+            Serial.print(pubSubClient.state());
+            delay(200);
+        }
     }
 
     topicHandlerRegistry.registerHandler(new D4LightHandler());
 
     blinker.stop();
+    Serial.println("good to go!");
 }
 
 void loop() {
     pubSubClient.loop();
     audio.loop();
+    if (pubSubClient.state() != MQTT_CONNECTED){
+        Serial.println(pubSubClient.state());
+        if (pubSubClient.connect("arduinoClient", MQTT_USER, MQTT_PW)) {
+            Serial.println("topic subscribing now");
+            pubSubClient.subscribe("d4Lights");
+        } else {
+            Serial.println("Connection failed");
+            Serial.print(pubSubClient.state());
+            delay(200);
+        }
+    }
 }

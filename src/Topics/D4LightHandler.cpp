@@ -83,9 +83,14 @@ void D4LightHandler::handle(char *topic, char *payload) {
 
     int newNumberOfLeds = jsonObject["numberOfLeds"];
     String newEffectName = jsonObject["effect"];
+    Serial.println("nullptr check");
     if (effectTask != nullptr) {
         vTaskDelete(effectTask);
         effectTask = nullptr;
+    }
+
+    if (effectTask == nullptr){
+        Serial.println("effectTask is a nullptr");
     }
 
     numberOfLeds = newNumberOfLeds;
